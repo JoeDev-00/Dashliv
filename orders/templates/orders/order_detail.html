@@ -1,0 +1,209 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Commande #{{ order.tracking_number }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Détails de la commande</h1>
+            <p class="lead">Numéro de suivi: <strong>{{ order.tracking_number }}</strong></p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="status-badge status-{{ order.status }}">
+                {{ order.get_status_display }}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Carte de suivi -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div id="tracking_map" class="tracking-map"></div>
+                </div>
+            </div>
+
+            <!-- Détails de la commande -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Informations de la commande</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Détails du colis</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Nom:</strong> {{ order.package.name }}</li>
+                                <li><strong>Poids:</strong> {{ order.package.weight }} kg</li>
+                                <li><strong>Taille:</strong> {{ order.package.get_size_display }}</li>
+                                <li><strong>Fragile:</strong> {% if order.package.is_fragile %}Oui{% else %}Non{% endif %}</li>
+                                <li><strong>Signature requise:</strong> {% if order.package.requires_signature %}Oui{% else %}Non{% endif %}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Service et prix</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Type de service:</strong> {{ order.get_service_type_display }}</li>
+                                <li><strong>Prix:</strong> {{ order.price }} €</li>
+                                <li><strong>Assurance:</strong> {% if order.has_insurance %}Oui ({{ order.insurance_amount }} €){% else %}Non{% endif %}</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Adresse de prise en charge</h6>
+                            <p>{{ order.pickup_address }}</p>
+                            <p><strong>Date prévue:</strong> {{ order.scheduled_pickup_time|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Adresse de livraison</h6>
+                            <p>{{ order.delivery_address }}</p>
+                            <p><strong>Date estimée:</strong> {{ order.estimated_delivery_time|date:"d/m/Y H:i" }}</p>
+                        </div>
+                    </div>
+
+                    {% if order.notes %}
+                    <hr>
+                    <h6>Notes</h6>
+                    <p>{{ order.notes }}</p>
+                    {% endif %}
+
+                    {% if order.status == 'delivered' and not order.rating %}
+                    <div class="mt-4">
+                        <a href="{% url 'rate_service' order.id %}" class="btn btn-primary">
+                            <i class="fas fa-star me-2"></i>Évaluer cette livraison
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Statut de la livraison -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Statut de la livraison</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="timeline">
+                        {% for update in updates %}
+                        <div class="timeline-item">
+                            <div class="timeline-marker status-{{ update.status }}"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">{{ update.get_status_display }}</h6>
+                                <p class="text-muted small mb-2">{{ update.timestamp|date:"d/m/Y H:i" }}</p>
+                                {% if update.description %}
+                                <p class="mb-0">{{ update.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="p-4 text-center">
+                            <p class="text-muted mb-0">Aucune mise à jour disponible</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Informations du livreur -->
+            {% if order.delivery_person %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Livreur</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        {% if order.delivery_person.user.profile_image %}
+                        <img src="{{ order.delivery_person.user.profile_image.url }}" alt="Livreur" class="rounded-circle me-3" width="60">
+                        {% else %}
+                        <div class="avatar-placeholder me-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">{{ order.delivery_person.user.get_full_name }}</h6>
+                            <div class="rating text-warning">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= order.delivery_person.rating %}
+                                <i class="fas fa-star"></i>
+                                {% elif forloop.counter <= order.delivery_person.rating|add:0.5 %}
+                                <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                <i class="far fa-star"></i>
+                                {% endif %}
+                                {% endfor %}
+                                <span class="text-muted ms-1">{{ order.delivery_person.rating|floatformat:1 }}/5</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if order.status == 'in_transit' %}
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="tel:{{ order.delivery_person.user.phone_number }}" class="btn btn-outline-primary">
+                            <i class="fas fa-phone me-2"></i>Appeler le livreur
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'track_order' order.tracking_number %}" class="btn btn-primary">
+                            <i class="fas fa-map-marker-alt me-2"></i>Suivre la livraison
+                        </a>
+                        {% if order.status == 'pending' and user == order.client %}
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                            <i class="fas fa-times me-2"></i>Annuler la commande
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal d'annulation -->
+{% if order.status == 'pending' and user == order.client %}
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmer l'annulation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir annuler cette commande ?</p>
+                <p class="text-danger mb-0">Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                <form method="post" action="{% url 'cancel_order' order.id %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirmer l'annulation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/tracking.js' %}"></script>
+{% endblock %}
