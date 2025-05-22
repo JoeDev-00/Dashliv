@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Évaluer la livraison{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/ratings.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h1 class="h4 mb-0">Évaluer votre livraison</h1>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <div class="d-flex align-items-center">
+                            <div class="order-info me-auto">
+                                <p class="mb-0"><strong>Commande:</strong> {{ order.tracking_number }}</p>
+                                <p class="mb-0"><strong>Livreur:</strong> {{ order.delivery_person.user.get_full_name }}</p>
+                                <p class="mb-0"><strong>Date de livraison:</strong> {{ order.actual_delivery_time|date:"d/m/Y H:i" }}</p>
+                            </div>
+                            <div class="order-status">
+                                <span class="badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Évaluation globale</label>
+                            <div class="rating-group">
+                                <div class="rating-stars">
+                                    {% for i in "12345" %}
+                                        <input type="radio" name="overall_rating" value="{{ forloop.counter }}" id="overall_{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                                        <label for="overall_{{ forloop.counter }}"><i class="fas fa-star"></i></label>
+                                    {% endfor %}
+                                </div>
+                                <div class="rating-text" id="overall_rating_text">Excellent</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <label class="form-label">Ponctualité</label>
+                                <div class="rating-group">
+                                    <div class="rating-stars small">
+                                        {% for i in "12345" %}
+                                            <input type="radio" name="timeliness_rating" value="{{ forloop.counter }}" id="timeliness_{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                                            <label for="timeliness_{{ forloop.counter }}"><i class="fas fa-star"></i></label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">État du colis</label>
+                                <div class="rating-group">
+                                    <div class="rating-stars small">
+                                        {% for i in "12345" %}
+                                            <input type="radio" name="package_condition_rating" value="{{ forloop.counter }}" id="package_{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                                            <label for="package_{{ forloop.counter }}"><i class="fas fa-star"></i></label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Service du livreur</label>
+                                <div class="rating-group">
+                                    <div class="rating-stars small">
+                                        {% for i in "12345" %}
+                                            <input type="radio" name="delivery_person_rating" value="{{ forloop.counter }}" id="delivery_person_{{ forloop.counter }}" {% if forloop.counter == 5 %}checked{% endif %}>
+                                            <label for="delivery_person_{{ forloop.counter }}"><i class="fas fa-star"></i></label>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="id_comment" class="form-label">Commentaire (optionnel)</label>
+                            <textarea class="form-control" id="id_comment" name="comment" rows="4" placeholder="Partagez votre expérience..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'order_detail' order.tracking_number %}" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Soumettre l'évaluation</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Mettre à jour le texte de l'évaluation globale
+        const overallRatingInputs = document.querySelectorAll('input[name="overall_rating"]');
+        const overallRatingText = document.getElementById('overall_rating_text');
+        
+        const ratingTexts = {
+            1: 'Très mauvais',
+            2: 'Mauvais',
+            3: 'Moyen',
+            4: 'Bon',
+            5: 'Excellent'
+        };
+        
+        overallRatingInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                overallRatingText.textContent = ratingTexts[this.value];
+            });
+        });
+    });
+</script>
+{% endblock %}

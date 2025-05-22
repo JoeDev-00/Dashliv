@@ -1,0 +1,85 @@
+livraison_system/
+├── manage.py
+├── livraison_system/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
+├── users/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   └── templates/
+│       └── users/
+│           ├── login.html
+│           ├── register.html
+│           └── profile.html
+├── orders/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   └── templates/
+│       └── orders/
+│           ├── create_order.html
+│           ├── order_detail.html
+│           └── order_list.html
+├── tracking/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── tracking/
+│           └── track_order.html
+├── dashboard/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   └── templates/
+│       └── dashboard/
+│           ├── client_dashboard.html
+│           └── delivery_dashboard.html
+├── ratings/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   └── templates/
+│       └── ratings/
+│           └── rate_service.html
+├── notifications/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── apps.py
+│   ├── models.py
+│   ├── views.py
+│   └── utils.py
+├── static/
+│   ├── css/
+│   │   ├── main.css
+│   │   └── dashboard.css
+│   ├── js/
+│   │   ├── maps.js
+│   │   ├── tracking.js
+│   │   └── notifications.js
+│   └── images/
+└── templates/
+    ├── base.html
+    └── home.html

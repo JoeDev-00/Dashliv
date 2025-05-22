@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Préférences de notification{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4">Préférences de notification</h1>
+            
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="mb-3">Canaux de notification</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    {{ form.email_enabled }}
+                                    <label class="form-check-label" for="{{ form.email_enabled.id_for_label }}">
+                                        Notifications par email
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    {{ form.sms_enabled }}
+                                    <label class="form-check-label" for="{{ form.sms_enabled.id_for_label }}">
+                                        Notifications par SMS
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check form-switch">
+                                    {{ form.in_app_enabled }}
+                                    <label class="form-check-label" for="{{ form.in_app_enabled.id_for_label }}">
+                                        Notifications dans l'application
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <h5 class="mb-3">Types de notification</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.order_status_update }}
+                                    <label class="form-check-label" for="{{ form.order_status_update.id_for_label }}">
+                                        Mises à jour de statut des commandes
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.delivery_reminder }}
+                                    <label class="form-check-label" for="{{ form.delivery_reminder.id_for_label }}">
+                                        Rappels de livraison
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    {{ form.rating_reminder }}
+                                    <label class="form-check-label" for="{{ form.rating_reminder.id_for_label }}">
+                                        Rappels d'évaluation
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    {{ form.promotional_messages }}
+                                    <label class="form-check-label" for="{{ form.promotional_messages.id_for_label }}">
+                                        Messages promotionnels
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Enregistrer les préférences</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

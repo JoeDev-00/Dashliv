@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Suivre Votre Commande</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="order_id">ID de Commande</label>
+            <input type="text" class="form-control" id="order_id" name="order_id" required>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Suivre la Commande</button>
+    </form>
+    
+    {% if tracking_info %}
+    <div class="tracking-results mt-4">
+        <h2>Informations de Suivi</h2>
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Commande #{{ tracking_info.order_id }}</h5>
+                <p class="card-text">Statut : {{ tracking_info.status }}</p>
+                <p class="card-text">Emplacement Actuel : {{ tracking_info.location }}</p>
+                <p class="card-text">Livraison Estimée : {{ tracking_info.estimated_delivery }}</p>
+                
+                <h6>Historique de Suivi</h6>
+                <ul class="list-group">
+                    {% for event in tracking_info.events %}
+                    <li class="list-group-item">
+                        <strong>{{ event.timestamp }}</strong> - {{ event.description }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

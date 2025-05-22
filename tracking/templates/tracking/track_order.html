@@ -1,0 +1,415 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Suivi de commande #{{ order.tracking_number }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/tracking.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Suivi de commande</h1>
+            <p class="lead">Numéro de suivi: <strong>{{ order.tracking_number }}</strong></p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <div class="status-badge status-{{ order.status }}">
+                {{ order.get_status_display }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Carte de suivi -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-0">
+                    <div id="tracking_map" class="tracking-map"></div>
+                </div>
+            </div>
+            
+            <!-- Informations de la commande -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Détails de la commande</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Informations générales</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Date de création:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</li>
+                                <li><strong>Service:</strong> {{ order.get_service_type_display }}</li>
+                                <li><strong>Statut:</strong> {{ order.get_status_display }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Dates importantes</h6>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <strong>Prise en charge prévue:</strong> 
+                                    {{ order.scheduled_pickup_time|date:"d/m/Y H:i" }}
+                                </li>
+                                <li>
+                                    <strong>Prise en charge effective:</strong> 
+                                    {% if order.actual_pickup_time %}
+                                        {{ order.actual_pickup_time|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <strong>Livraison estimée:</strong> 
+                                    {{ order.estimated_delivery_time|date:"d/m/Y H:i" }}
+                                </li>
+                                <li>
+                                    <strong>Livraison effective:</strong> 
+                                    {% if order.actual_delivery_time %}
+                                        {{ order.actual_delivery_time|date:"d/m/Y H:i" }}
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Adresse de prise en charge</h6>
+                            <p>{{ order.pickup_address }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Adresse de livraison</h6>
+                            <p>{{ order.delivery_address }}</p>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Détails du colis</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Nom:</strong> {{ order.package.name }}</li>
+                                <li><strong>Poids:</strong> {{ order.package.weight }} kg</li>
+                                <li><strong>Taille:</strong> {{ order.package.get_size_display }}</li>
+                                <li><strong>Fragile:</strong> {% if order.package.is_fragile %}Oui{% else %}Non{% endif %}</li>
+                                <li><strong>Signature requise:</strong> {% if order.package.requires_signature %}Oui{% else %}Non{% endif %}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Informations supplémentaires</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Prix:</strong> {{ order.price }} €</li>
+                                <li><strong>Assurance:</strong> {% if order.has_insurance %}Oui ({{ order.insurance_amount }} €){% else %}Non{% endif %}</li>
+                                {% if order.notes %}
+                                    <li><strong>Notes:</strong> {{ order.notes }}</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    {% if order.status == 'delivered' and not order.rating %}
+                        <div class="mt-4">
+                            <a href="{% url 'rate_service' order.id %}" class="btn btn-primary">
+                                <i class="fas fa-star me-2"></i>Évaluer cette livraison
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Chronologie -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Chronologie</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="timeline">
+                        {% for update in updates %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker status-{{ update.status }}"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0">{{ update.get_status_display }}</h6>
+                                    <p class="text-muted small mb-2">{{ update.timestamp|date:"d/m/Y H:i" }}</p>
+                                    {% if update.description %}
+                                        <p class="mb-0">{{ update.description }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="p-4 text-center">
+                                <p class="text-muted mb-0">Aucune mise à jour disponible</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Informations du livreur -->
+            {% if order.delivery_person and order.status != 'pending' and order.status != 'cancelled' %}
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Livreur</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            {% if order.delivery_person.user.profile_image %}
+                                <img src="{{ order.delivery_person.user.profile_image.url }}" alt="Livreur" class="rounded-circle me-3" width="60">
+                            {% else %}
+                                <div class="avatar-placeholder me-3">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h6 class="mb-0">{{ order.delivery_person.user.get_full_name }}</h6>
+                                <div class="rating text-warning">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= order.delivery_person.rating %}
+                                            <i class="fas fa-star"></i>
+                                        {% elif forloop.counter <= order.delivery_person.rating|add:0.5 %}
+                                            <i class="fas fa-star-half-alt"></i>
+                                        {% else %}
+                                            <i class="far fa-star"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="text-muted ms-1">{{ order.delivery_person.rating|floatformat:1 }}/5</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {% if order.status == 'in_transit' %}
+                            <div class="d-grid gap-2">
+                                <a href="tel:{{ order.delivery_person.user.phone_number }}" class="btn btn-outline-primary">
+                                    <i class="fas fa-phone me-2"></i>Appeler le livreur
+                                </a>
+                                <button class="btn btn-outline-secondary" id="sendMessageBtn">
+                                    <i class="fas fa-comment me-2"></i>Envoyer un message
+                                </button>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Aide et support -->
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Besoin d'aide ?</h5>
+                </div>
+                <div class="card-body">
+                    <p>Si vous avez des questions concernant votre livraison, n'hésitez pas à contacter notre service client.</p>
+                    <div class="d-grid gap-2">
+                        <a href="tel:+33123456789" class="btn btn-outline-primary">
+                            <i class="fas fa-phone me-2"></i>+33 1 23 45 67 89
+                        </a>
+                        <a href="mailto:support@dashliv.com" class="btn btn-outline-secondary">
+                            <i class="fas fa-envelope me-2"></i>support@dashliv.com
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal pour envoyer un message -->
+<div class="modal fade" id="messageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Envoyer un message au livreur</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    <div class="mb-3">
+                        <label for="messageText" class="form-label">Message</label>
+                        <textarea class="form-control" id="messageText" rows="3" placeholder="Écrivez votre message ici..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary" id="sendMessageSubmit">Envoyer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/tracking.js' %}"></script>
+<script>
+    // Initialisation de la carte
+    function initMap() {
+        const mapElement = document.getElementById('tracking_map');
+        const map = new google.maps.Map(mapElement, {
+            center: { lat: 48.8566, lng: 2.3522 }, // Paris par défaut
+            zoom: 12
+        });
+        
+        // Coordonnées des adresses
+        const pickupLocation = {
+            lat: {{ order.pickup_latitude }},
+            lng: {{ order.pickup_longitude }}
+        };
+        
+        const deliveryLocation = {
+            lat: {{ order.delivery_latitude }},
+            lng: {{ order.delivery_longitude }}
+        };
+        
+        // Marqueurs
+        const pickupMarker = new google.maps.Marker({
+            position: pickupLocation,
+            map: map,
+            icon: {
+                url: "{% static 'images/pickup-marker.png' %}",
+                scaledSize: new google.maps.Size(40, 40)
+            },
+            title: "Adresse de prise en charge"
+        });
+        
+        const deliveryMarker = new google.maps.Marker({
+            position: deliveryLocation,
+            map: map,
+            icon: {
+                url: "{% static 'images/delivery-marker.png' %}",
+                scaledSize: new google.maps.Size(40, 40)
+            },
+            title: "Adresse de livraison"
+        });
+        
+        // Infowindows
+        const pickupInfo = new google.maps.InfoWindow({
+            content: `<div><strong>Prise en charge</strong><p>${"{{ order.pickup_address }}"}</p></div>`
+        });
+        
+        const deliveryInfo = new google.maps.InfoWindow({
+            content: `<div><strong>Livraison</strong><p>${"{{ order.delivery_address }}"}</p></div>`
+        });
+        
+        pickupMarker.addListener('click', function() {
+            pickupInfo.open(map, pickupMarker);
+        });
+        
+        deliveryMarker.addListener('click', function() {
+            deliveryInfo.open(map, deliveryMarker);
+        });
+        
+        // Ajuster la vue pour montrer les deux marqueurs
+        const bounds = new google.maps.LatLngBounds();
+        bounds.extend(pickupLocation);
+        bounds.extend(deliveryLocation);
+        map.fitBounds(bounds);
+        
+        // Si la commande est en cours de livraison, ajouter le marqueur du livreur
+        {% if order.status == 'in_transit' and order.delivery_person %}
+            // Marqueur du livreur (position initiale)
+            const deliveryPersonMarker = new google.maps.Marker({
+                position: pickupLocation, // Position initiale
+                map: map,
+                icon: {
+                    url: "{% static 'images/delivery-person-marker.png' %}",
+                    scaledSize: new google.maps.Size(40, 40)
+                },
+                title: "Livreur"
+            });
+            
+            // Infowindow du livreur
+            const deliveryPersonInfo = new google.maps.InfoWindow({
+                content: `<div><strong>Livreur</strong><p>${"{{ order.delivery_person.user.get_full_name }}"}</p></div>`
+            });
+            
+            deliveryPersonMarker.addListener('click', function() {
+                deliveryPersonInfo.open(map, deliveryPersonMarker);
+            });
+            
+            // Tracer l'itinéraire
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer({
+                map: map,
+                suppressMarkers: true, // Ne pas afficher les marqueurs par défaut
+                polylineOptions: {
+                    strokeColor: '#4285F4',
+                    strokeWeight: 5
+                }
+            });
+            
+            directionsService.route({
+                origin: pickupLocation,
+                destination: deliveryLocation,
+                travelMode: google.maps.TravelMode.DRIVING
+            }, function(response, status) {
+                if (status === 'OK') {
+                    directionsRenderer.setDirections(response);
+                }
+            });
+            
+            // Mettre à jour la position du livreur périodiquement
+            function updateDeliveryPersonLocation() {
+                fetch(`/tracking/get_tracking_points/${order.id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.points.length > 0) {
+                            // Récupérer le dernier point
+                            const lastPoint = data.points[data.points.length - 1];
+                            const position = {
+                                lat: parseFloat(lastPoint.latitude),
+                                lng: parseFloat(lastPoint.longitude)
+                            };
+                            
+                            // Mettre à jour la position du marqueur
+                            deliveryPersonMarker.setPosition(position);
+                            
+                            // Centrer la carte sur la position du livreur
+                            map.panTo(position);
+                        }
+                    })
+                    .catch(error => console.error('Erreur lors de la récupération des points de suivi:', error));
+            }
+            
+            // Mettre à jour la position toutes les 30 secondes
+            updateDeliveryPersonLocation(); // Première mise à jour
+            setInterval(updateDeliveryPersonLocation, 30000); // Mises à jour suivantes
+        {% endif %}
+    }
+    
+    // Modal pour envoyer un message
+    document.addEventListener('DOMContentLoaded', function() {
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const sendMessageSubmit = document.getElementById('sendMessageSubmit');
+        const messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+        
+        if (sendMessageBtn) {
+            sendMessageBtn.addEventListener('click', function() {
+                messageModal.show();
+            });
+        }
+        
+        if (sendMessageSubmit) {
+            sendMessageSubmit.addEventListener('click', function() {
+                const messageText = document.getElementById('messageText').value;
+                
+                if (messageText.trim() === '') {
+                    alert('Veuillez saisir un message.');
+                    return;
+                }
+                
+                // Envoyer le message (simulation)
+                alert('Message envoyé au livreur !');
+                messageModal.hide();
+                document.getElementById('messageText').value = '';
+            });
+        }
+    });
+</script>
+{% endblock %}

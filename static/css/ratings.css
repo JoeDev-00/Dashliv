@@ -1,0 +1,86 @@
+/* Styles pour la page d'évaluation */
+
+/* Groupe d'évaluation */
+.rating-group {
+  margin-bottom: 1rem;
+}
+
+/* Étoiles d'évaluation */
+.rating-stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+}
+
+.rating-stars input {
+  display: none;
+}
+
+.rating-stars label {
+  cursor: pointer;
+  font-size: 2rem;
+  color: #ddd;
+  margin-right: 0.25rem;
+}
+
+.rating-stars.small label {
+  font-size: 1.5rem;
+}
+
+.rating-stars input:checked ~ label,
+.rating-stars label:hover,
+.rating-stars label:hover ~ label {
+  color: #ffc107;
+}
+
+.rating-stars input:checked + label:hover,
+.rating-stars input:checked ~ label:hover,
+.rating-stars input:checked ~ label:hover ~ label,
+.rating-stars label:hover ~ input:checked ~ label {
+  color: #ffdb70;
+}
+
+/* Texte d'évaluation */
+.rating-text {
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* Badges de statut */
+.status-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.badge.status-pending {
+  background-color: var(--status-pending-color);
+  color: white;
+}
+
+.badge.status-confirmed {
+  background-color: var(--status-confirmed-color);
+  color: white;
+}
+
+.badge.status-picked-up {
+  background-color: var(--status-picked-up-color);
+  color: white;
+}
+
+.badge.status-in-transit {
+  background-color: var(--status-in-transit-color);
+  color: white;
+}
+
+.badge.status-delivered {
+  background-color: var(--status-delivered-color);
+  color: white;
+}
+
+.badge.status-cancelled {
+  background-color: var(--status-cancelled-color);
+  color: white;
+}

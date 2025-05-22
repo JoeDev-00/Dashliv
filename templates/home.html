@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ExpressDelivery - Livraison rapide et fiable{% endblock %}
+
+{% block content %}
+<section class="hero bg-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Livraison rapide et fiable</h1>
+                <p class="lead mb-4">Nous livrons vos colis en toute sécurité, où que vous soyez. Suivez votre livraison en temps réel et recevez des notifications à chaque étape.</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'create_order' %}" class="btn btn-light btn-lg">Planifiez votre livraison</a>
+                    <a href="{% url 'track_order' %}" class="btn btn-outline-light btn-lg">Suivre une commande</a>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <img src="{% static 'images/maldives.jpg' %}" alt="Livraison" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Nos fonctionnalités</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-map-marked-alt fa-2x"></i>
+                        </div>
+                        <h3 class="card-title h5">Suivi en temps réel</h3>
+                        <p class="card-text">Suivez votre colis en temps réel sur une carte interactive et recevez des mises à jour à chaque étape.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-bell fa-2x"></i>
+                        </div>
+                        <h3 class="card-title h5">Notifications instantanées</h3>
+                        <p class="card-text">Recevez des notifications par SMS ou email à chaque étape de la livraison de votre colis.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary text-white rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-star fa-2x"></i>
+                        </div>
+                        <h3 class="card-title h5">Évaluations et avis</h3>
+                        <p class="card-text">Évaluez nos services après chaque livraison et aidez-nous à améliorer constamment notre qualité.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="how-it-works py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Comment ça marche</h2>
+        <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <div class="step text-center">
+                    <div class="step-number">1</div>
+                    <h3 class="h5 mt-3">Créez votre commande</h3>
+                    <p>Remplissez le formulaire avec les détails de votre colis et les adresses.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-lg-0">
+                <div class="step text-center">
+                    <div class="step-number">2</div>
+                    <h3 class="h5 mt-3">Nous récupérons votre colis</h3>
+                    <p>Un livreur vient chercher votre colis à l'adresse indiquée.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4 mb-md-0">
+                <div class="step text-center">
+                    <div class="step-number">3</div>
+                    <h3 class="h5 mt-3">Suivez la livraison</h3>
+                    <p>Suivez votre colis en temps réel sur notre carte interactive.</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="step text-center">
+                    <div class="step-number">4</div>
+                    <h3 class="h5 mt-3">Livraison et évaluation</h3>
+                    <p>Votre colis est livré et vous pouvez évaluer notre service.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="testimonials py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Ce que disent nos clients</h2>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="card-text">"Service impeccable ! Mon colis est arrivé en avance et le livreur était très professionnel. Je recommande vivement."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://via.placeholder.com/50" alt="Client" class="rounded-circle me-3">
+                            <div>
+                                <h5 class="mb-0">Sophie Martin</h5>
+                                <small class="text-muted">Entrepreneuse</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                        <p class="card-text">"J'utilise ExpressDelivery pour toutes mes livraisons professionnelles. Le suivi en temps réel est un vrai plus pour mes clients."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://via.placeholder.com/50" alt="Client" class="rounded-circle me-3">
+                            <div>
+                                <h5 class="mb-0">Thomas Dubois</h5>
+                                <small class="text-muted">Gérant de boutique</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="d-flex mb-3">
+                            <div class="text-warning">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                        <p class="card-text">"Les notifications par SMS sont très pratiques. J'ai toujours su où était mon colis et quand il allait arriver. Très satisfaite !"</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <img src="https://via.placeholder.com/50" alt="Client" class="rounded-circle me-3">
+                            <div>
+                                <h5 class="mb-0">Julie Leroy</h5>
+                                <small class="text-muted">Étudiante</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Prêt à essayer notre service ?</h2>
+        <p class="lead mb-4">Inscrivez-vous dès maintenant et bénéficiez de 10% de réduction sur votre première livraison.</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg">S'inscrire maintenant</a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,128 @@
+/* Styles pour les tableaux de bord */
+
+/* Cartes statistiques */
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+/* Carte des livraisons */
+.dashboard-map {
+  height: 400px;
+  width: 100%;
+}
+
+/* Badges de statut */
+.badge.status-pending {
+  background-color: var(--status-pending-color);
+  color: white;
+}
+
+.badge.status-confirmed {
+  background-color: var(--status-confirmed-color);
+  color: white;
+}
+
+.badge.status-picked-up {
+  background-color: var(--status-picked-up-color);
+  color: white;
+}
+
+.badge.status-in-transit {
+  background-color: var(--status-in-transit-color);
+  color: white;
+}
+
+.badge.status-delivered {
+  background-color: var(--status-delivered-color);
+  color: white;
+}
+
+.badge.status-cancelled {
+  background-color: var(--status-cancelled-color);
+  color: white;
+}
+
+/* Timeline */
+.timeline {
+  position: relative;
+  padding: 0.5rem 0;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 1rem;
+  width: 2px;
+  background-color: var(--light-gray-color);
+}
+
+.timeline-item {
+  position: relative;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+  border-bottom: 1px solid var(--light-gray-color);
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: 1rem;
+  top: 1.25rem;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  transform: translateX(-50%);
+}
+
+.timeline-marker.status-pending {
+  background-color: var(--status-pending-color);
+}
+
+.timeline-marker.status-confirmed {
+  background-color: var(--status-confirmed-color);
+}
+
+.timeline-marker.status-picked-up {
+  background-color: var(--status-picked-up-color);
+}
+
+.timeline-marker.status-in-transit {
+  background-color: var(--status-in-transit-color);
+}
+
+.timeline-marker.status-delivered {
+  background-color: var(--status-delivered-color);
+}
+
+.timeline-marker.status-cancelled {
+  background-color: var(--status-cancelled-color);
+}
+
+/* Timeline small */
+.timeline.small .timeline-item {
+  padding: 0.5rem 0.5rem 0.5rem 2rem;
+}
+
+.timeline.small .timeline-marker {
+  width: 10px;
+  height: 10px;
+  top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .dashboard-map {
+    height: 300px;
+  }
+}

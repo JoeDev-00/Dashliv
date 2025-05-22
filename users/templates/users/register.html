@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h1 class="h4 text-center mb-4">Créer un compte</h1>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_username" class="form-label">Nom d'utilisateur</label>
+                                {{ form.username.errors }}
+                                {{ form.username|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">Email</label>
+                                {{ form.email.errors }}
+                                {{ form.email|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password1" class="form-label">Mot de passe</label>
+                                {{ form.password1.errors }}
+                                {{ form.password1|add_class:"form-control" }}
+                                <div class="form-text">
+                                    <ul class="small">
+                                        <li>Votre mot de passe ne peut pas être trop similaire à vos autres informations personnelles.</li>
+                                        <li>Votre mot de passe doit contenir au moins 8 caractères.</li>
+                                        <li>Votre mot de passe ne peut pas être un mot de passe couramment utilisé.</li>
+                                        <li>Votre mot de passe ne peut pas être entièrement numérique.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_password2" class="form-label">Confirmation du mot de passe</label>
+                                {{ form.password2.errors }}
+                                {{ form.password2|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_phone_number" class="form-label">Numéro de téléphone</label>
+                                {{ form.phone_number.errors }}
+                                {{ form.phone_number|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_user_type" class="form-label">Type de compte</label>
+                                {{ form.user_type.errors }}
+                                {{ form.user_type|add_class:"form-select" }}
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">S'inscrire</button>
+                        </div>
+                    </form>
+                    
+                    <hr>
+                    
+                    <div class="text-center">
+                        <p class="mb-0">Vous avez déjà un compte ? <a href="{% url 'login' %}" class="text-decoration-none">Se connecter</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

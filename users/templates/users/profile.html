@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Mon profil</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    {% if user.profile_image %}
+                        <img src="{{ user.profile_image.url }}" alt="{{ user.username }}" class="rounded-circle img-thumbnail mb-3" width="150">
+                    {% else %}
+                        <div class="avatar-placeholder mb-3 mx-auto">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="card-title">{{ user.get_full_name|default:user.username }}</h5>
+                    <p class="card-text text-muted">{{ user.get_user_type_display }}</p>
+                    
+                    {% if user.user_type == 'delivery' %}
+                        <div class="rating text-warning mb-2">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= user.delivery_profile.rating %}
+                                    <i class="fas fa-star"></i>
+                                {% elif forloop.counter <= user.delivery_profile.rating|add:0.5 %}
+                                    <i class="fas fa-star-half-alt"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            <span class="text-muted ms-1">{{ user.delivery_profile.rating|floatformat:1 }}/5</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="{% url 'notification_preferences' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-bell me-2"></i>Préférences de notification
+                        </a>
+                        <a href="{% url 'password_reset' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-key me-2"></i>Changer de mot de passe
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            {% if user.user_type == 'delivery' %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Informations de livraison</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Type de véhicule</span>
+                                <span class="badge bg-primary rounded-pill">{{ user.delivery_profile.vehicle_type }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Numéro de licence</span>
+                                <span>{{ user.delivery_profile.license_number }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Disponibilité</span>
+                                {% if user.delivery_profile.is_available %}
+                                    <span class="badge bg-success">Disponible</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Indisponible</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {% elif user.user_type == 'client' %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Informations client</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Entreprise</span>
+                                <span>{{ user.client_profile.company_name|default:"-" }}</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>Abonnement</span>
+                                {% if user.client_profile.subscription_type %}
+                                    <span class="badge bg-primary rounded-pill">{{ user.client_profile.subscription_type }}</span>
+                                {% else %}
+                                    <span>-</span>
+                                {% endif %}
+                            </li>
+                            {% if user.client_profile.subscription_end_date %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>Fin d'abonnement</span>
+                                    <span>{{ user.client_profile.subscription_end_date|date:"d/m/Y" }}</span>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="card-title mb-0">Modifier mon profil</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_first_name" class="form-label">Prénom</label>
+                                {{ u_form.first_name.errors }}
+                                {{ u_form.first_name|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_last_name" class="form-label">Nom</label>
+                                {{ u_form.last_name.errors }}
+                                {{ u_form.last_name|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_username" class="form-label">Nom d'utilisateur</label>
+                                {{ u_form.username.errors }}
+                                {{ u_form.username|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_email" class="form-label">Email</label>
+                                {{ u_form.email.errors }}
+                                {{ u_form.email|add_class:"form-control" }}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="id_phone_number" class="form-label">Numéro de téléphone</label>
+                                {{ u_form.phone_number.errors }}
+                                {{ u_form.phone_number|add_class:"form-control" }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="id_profile_image" class="form-label">Photo de profil</label>
+                                {{ p_form.profile_image.errors }}
+                                {{ p_form.profile_image|add_class:"form-control" }}
+                                <div class="form-text">Formats acceptés: JPG, PNG, GIF</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_address" class="form-label">Adresse</label>
+                            {{ p_form.address.errors }}
+                            {{ p_form.address|add_class:"form-control" }}
+                        </div>
+                        
+                        {% if user.user_type == 'client' %}
+                            <div class="mb-3">
+                                <label for="id_company_name" class="form-label">Nom de l'entreprise (optionnel)</label>
+                                {{ p_form.company_name.errors }}
+                                {{ p_form.company_name|add_class:"form-control" }}
+                            </div>
+                        {% elif user.user_type == 'delivery' %}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_vehicle_type" class="form-label">Type de véhicule</label>
+                                    {{ p_form.vehicle_type.errors }}
+                                    {{ p_form.vehicle_type|add_class:"form-control" }}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_license_number" class="form-label">Numéro de licence</label>
+                                    {{ p_form.license_number.errors }}
+                                    {{ p_form.license_number|add_class:"form-control" }}
+                                </div>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
